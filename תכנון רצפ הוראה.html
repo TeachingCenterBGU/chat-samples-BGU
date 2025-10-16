@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>הדמיית שיחה — פרק הטמפרטורה</title>
+  <style>
+    :root {
+      --bg: #e9edf3;
+      --win: #ffffff;
+      --border: #d8dee9;
+      --text: #1f2937;
+      --user: #e3f6d4;
+      --bot: #eef1f5;
+      --note: #fff5d7;
+      --muted: #6b7280;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      height: 100vh;
+    }
+
+    .window {
+      width: 960px;
+      height: 640px;
+      background: var(--win);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.12);
+      display: grid;
+      grid-template-rows: 44px auto 36px;
+      overflow: hidden;
+    }
+    .titlebar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(#fbfbfc, #f3f5f8);
+      user-select: none;
+    }
+    .traffic { display: flex; gap: 8px; margin-inline-end: 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot.red { background: #ff5f56; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green { background: #27c93f; }
+    .titlebar h1 { font-size: 14px; font-weight: 600; margin: 0; }
+
+    .chat { display: flex; flex-direction: column; padding: 16px 20px; overflow-y: auto; gap: 10px; }
+    .row { display: flex; align-items: flex-end; gap: 8px; }
+    .row.user { justify-content: flex-end; }
+    .row.bot { justify-content: flex-start; }
+
+    .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: grid; place-items: center; font-size: 12px; font-weight: 700;
+      color: #374151; background: #e5e7eb; flex: 0 0 28px; user-select: none;
+    }
+
+    .bubble {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.06);
+      white-space: pre-wrap;
+      opacity: 0; transform: translateY(8px);
+      animation: fadeIn .5s forwards ease-out;
+    }
+    .bubble.user { background: var(--user); }
+    .bubble.bot { background: var(--bot); }
+
+    .gap { width: 100%; display: grid; place-items: center; }
+    .gap .label {
+      max-width: 80%; background: var(--note); border: 1px dashed #e9c46a;
+      border-radius: 999px; padding: 8px 14px; font-size: 13px; color: #7c5a00; text-align: center;
+      opacity: 0; transform: translateY(8px); animation: fadeIn .5s forwards ease-out;
+    }
+
+    .statusbar { font-size: 12px; color: var(--muted); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; border-top: 1px solid var(--border); background: #fafbfc; gap: 12px; }
+    .controls { display: flex; align-items: center; gap: 8px; }
+    button { border: 1px solid var(--border); background: white; border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+    button:hover { background: #f6f7f9; }
+    input[type="range"]{ width: 160px; }
+
+    @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <div class="window">
+    <div class="titlebar">
+      <div class="traffic"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+      <h1>שיחה על פרק הטמפרטורה</h1>
+    </div>
+
+    <div class="chat" id="chat"></div>
+
+    <div class="statusbar">
+      <div class="controls">
+        <button id="playPause">השהה</button>
+        <label>מהירות: <input type="range" id="speed" min="0.5" max="2" step="0.25" value="1"></label>
+      </div>
+      <span id="counter">0/0</span>
+    </div>
+  </div>
+
+  <script>
+    const BASE_DELAY_MS = 2200;
+
+    const script = [
+      { type: 'msg', sender: 'bot', text: 'מצוין 👌\nהנה נוסח מלא לפרק הטמפרטורה בספר, מסודר לפי הרצף שהצגת בשקופיות — כולל הסברים, נוסחאות, ודוגמאות קצרות הנוגעות להקשרים הנדסיים:' },
+      { type: 'gap', note: 'כאן הופיע טקסט שלם שאמור להקיף את כל נושא הטמפ׳ כולל דוגמאות' },
+      { type: 'msg', sender: 'bot', text: 'האם תרצי שאעצב לך את זה מיד גם כגרסה מוכנה ל־PDF/ספר (עם חלוקה לכותרות משנה וקריאות טבלאות)?\nאו שנמשיך קודם לפרק הלחץ לפני עיצוב?' },
+      { type: 'msg', sender: 'user', text: 'נראה לי שאנחנו נצטרך לעשות את זה לאט, שלב אחרי שלב. קודם כל פסקת פתיחה צריכה להתחבר לפירוש היומיומי המוכר של טמפ׳ ומשם להסביר שזה בעצם מדד לאנרגיה הקינטית.' },
+      { type: 'msg', sender: 'bot', text: 'מעולה מאוד — זו נקודת מוצא מצוינת.\nהנה ניסוח לפסקת פתיחה שמתחילה מהמובן היומיומי של טמפרטורה ומובילה בעדינות להבנה הפיזיקלית־הנדסית שלה:' },
+      { type: 'gap', note: 'דוגמה לניסוח פסקת פתיחה' },
+      { type: 'msg', sender: 'bot', text: 'רוצה שאוסיף מיד את הפסקה השנייה שמסבירה למה אי־אפשר למדוד את האנרגיה הזו ישירות, ולכן אנחנו מודדים תכונות עקיפות (נפח, התנגדות, קרינה)?\nזה המשך טבעי אחרי הפסקה הזו.' },
+      { type: 'msg', sender: 'user', text: 'לא, אני חושבת שאני עדיין לא שלמה עם ההסבר של המושגים חום וטמפרטורה ברמה היומיומית מול הרמה המדעית.' },
+      { type: 'msg', sender: 'bot', text: 'מצוין — זה בדיוק המקום לעצור עליו.\nההבחנה בין חום ל־טמפרטורה היא אחת הנקודות שהכי מבלבלות סטודנטים בתחילת הדרך, ולכן חשוב מאוד לנסח אותה באופן שמתחיל מהחוויה היומיומית.\nהנה ניסוח מפורט יותר לפסקת פתיחה שמדגישה את ההבדל הזה, בשפה ברורה אך מדויקת מדעית:' },
+      { type: 'gap', note: 'דוגמה לפסקת פתיחה שמדגישה הבדל בין חום לטמפרטורה' },
+      { type: 'msg', sender: 'bot', text: 'האם זה הכיוון שאת רוצה לפסקת הפתיחה — שמתחילה בתחושה המוכרת, מציגה את ההבחנה המדעית, ומכינה את הקרקע להסבר על אנרגיה קינטית?\nאם כן, אמשיך מיד עם הפסקה השנייה שמחברת את זה להגדרה הפיזיקלית של טמפרטורה (כלומר — מדד לאנרגיה הקינטית הממוצעת של החלקיקים).' },
+      { type: 'msg', sender: 'user', text: 'כן' },
+      { type: 'msg', sender: 'bot', text: 'מצוין 👌\nהנה הפסקה הבאה שממשיכה ישירות מאותה נקודה, ומעמיקה מההבחנה היומיומית אל המשמעות הפיזיקלית של טמפרטורה:' },
+      { type: 'gap', note: 'דוגמה לפסקה נוספת על האנרגיה הקינטית' },
+      { type: 'msg', sender: 'bot', text: 'האם תרצי שאמשיך לפסקה השלישית – זו שמסבירה למה אי־אפשר למדוד את האנרגיה הזו ישירות, ולכן מודדים תכונות פיזיקליות עקיפות כמו התנגדות חשמלית, התפשטות נפחית ופליטת קרינה?' },
+      { type: 'msg', sender: 'user', text: 'לא, נראה לי שאת הנושא של המדידות אנחנו נשאיר לסוף, מכאן אני רוצה לדבר על סולמות הטמפ׳ המוכרים ומאיפה הם הגיעו.' }
+    ];
+
+    const chat = document.getElementById('chat');
+    const counter = document.getElementById('counter');
+    const playPauseBtn = document.getElementById('playPause');
+    const speedInput = document.getElementById('speed');
+
+    counter.textContent = `0/${script.length}`;
+
+    function addMessage(entry){
+      if(entry.type === 'gap'){
+        const wrap = document.createElement('div');
+        wrap.className = 'gap';
+        wrap.innerHTML = `<div class="label">— ${entry.note} —</div>`;
+        chat.appendChild(wrap);
+        chat.scrollTop = chat.scrollHeight;
+        return;
+      }
+      const row = document.createElement('div');
+      row.className = `row ${entry.sender}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = entry.sender === 'user' ? 'את' : 'AI';
+
+      const bubble = document.createElement('div');
+      bubble.className = `bubble ${entry.sender}`;
+      bubble.textContent = entry.text;
+
+      if(entry.sender === 'user'){
+        row.appendChild(bubble);
+        row.appendChild(avatar);
+      } else {
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+      }
+      chat.appendChild(row);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    let i = 0;
+    let timer = null;
+    function step(){
+      if(i >= script.length){ timer && clearTimeout(timer); return; }
+      addMessage(script[i]);
+      i += 1;
+      counter.textContent = `${i}/${script.length}`;
+      const delay = BASE_DELAY_MS / parseFloat(speedInput.value || '1');
+      timer = setTimeout(step, delay);
+    }
+
+    step();
+
+    let playing = true;
+    playPauseBtn.addEventListener('click', ()=>{
+      if(playing){
+        playing = false; playPauseBtn.textContent = 'נגן';
+        timer && clearTimeout(timer);
+      } else {
+        playing = true; playPauseBtn.textContent = 'השהה';
+        step();
+      }
+    });
+  </script>
+</body>
+</html>

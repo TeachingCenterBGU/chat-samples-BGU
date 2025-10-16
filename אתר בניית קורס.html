@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>דוגמאות לשיחות עם בינה — בניית קורס שנה א׳</title>
+  <style>
+    :root{
+      --bg:#f4f6f9;--card:#ffffff;--text:#1f2937;--muted:#6b7280;--primary:#3b82f6;--border:#e5e7eb
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,Arial,sans-serif;}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid var(--border);background:#fff}
+    header h1{margin:0;font-size:20px}
+    header small{color:var(--muted)}
+    main{max-width:1000px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:1fr;gap:18px}
+    .intro{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;line-height:1.6}
+    .intro h2{font-size:18px;margin:0 0 8px}
+    .intro p{margin:0 0 10px}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+    .card h3{margin:0;font-size:16px}
+    .card p{margin:0;color:var(--muted);font-size:14px}
+    .card a{margin-top:auto;display:inline-block;text-decoration:none;border:1px solid var(--primary);color:var(--primary);padding:8px 12px;border-radius:10px}
+    .card a:hover{background:var(--primary);color:#fff}
+
+    footer{max-width:1000px;margin:8px auto 24px;padding:0 16px;color:var(--muted);font-size:12px}
+    .tips{background:#fff;border:1px dashed var(--border);border-radius:12px;padding:10px 12px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>דוגמאות לשיחות עם בינה — בניית קורס שנה א׳</h1>
+    <small>היחידה לקידום איכות ההוראה והלמידה</small>
+    <small>אוניברסיטת בן גוריון בנגב</small>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h2>מה אתם רואים כאן?</h2>
+      <p>
+        בדף זה מרוכזות <strong>דוגמאות לשיחות</strong> עם מודל בינה מלאכותית שנערכו במהלך <strong>בניית קורס חדש לשנה א׳</strong>.
+      </p>
+      <p>
+        חשוב להדגיש: השיח שמוצג כאן מגיע <em>לאחר</em> הרבה התייעצויות ואיטרציות. בהתחלה ההסברים והתוצרים לא תמיד התאימו לצרכים הפדגוגיים; ככל שהזמן עבר, השיחות התחדדו והותאמו למה שרצינו.
+      </p>
+      <p>
+        בסופו של דבר, <strong>כל תוכן</strong> שנלקח מכאן עבר <strong>עיבוד, בדיקה ועריכה</strong> לפני שימוש בכיתה או בספר. יחד עם זאת, השיחות היו <strong>נקודת פתיחה טובה בהרבה</strong> לעומת דף ריק.
+      </p>
+    </section>
+
+    <section>
+      <div class="grid">
+        <article class="card">
+          <h3>תכנון רצף הוראה</h3>
+          <p>שיחה שמדגימה איך מתהווה רצף פדגוגי והחלטות ביניים.</p>
+          <a href="תכנון רצף הוראה.html" target="_blank" rel="noopener">פתיחת השיחה</a>
+        </article>
+        <article class="card">
+          <h3>בניית שאלות</h3>
+          <p>שיחה סביב ניסוח שאלות תרגול — חישוביות והסברתיות — והתאמה לרמת הסטודנטים.</p>
+          <a href="בניית שאלות.html" target="_blank" rel="noopener">פתיחת השיחה</a>
+        </article>
+        <article class="card">
+          <h3>חיבור בין נושאים</h3>
+          <p>שיחה שמדגימה גשרים בין פרקים (למשל: מטמפרטורה ללחץ) וקטעי מעבר.</p>
+          <a href="חיבור בין נושאים.html" target="_blank" rel="noopener">פתיחת השיחה</a>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    © היחידה לקידום איכות ההוראה והלמידה, אוניברסיטת בן גוריון בנגב
+  </footer>
+</body>
+</html>

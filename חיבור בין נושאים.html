@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>הדמיית שיחה — תצוגת מחשב</title>
+  <style>
+    :root {
+      --bg: #e9edf3;
+      --win: #ffffff;
+      --border: #d8dee9;
+      --text: #1f2937;
+      --user: #e3f6d4;
+      --bot: #eef1f5;
+      --note: #fff5d7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      height: 100vh;
+    }
+
+    /* חלון בסגנון.desktop */
+    .window {
+      width: 960px;
+      height: 640px;
+      background: var(--win);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.12);
+      display: grid;
+      grid-template-rows: 44px auto 32px;
+      overflow: hidden;
+    }
+    .titlebar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(#fbfbfc, #f3f5f8);
+      user-select: none;
+    }
+    .traffic {
+      display: flex; gap: 8px; margin-inline-end: 8px;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot.red { background: #ff5f56; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green { background: #27c93f; }
+    .titlebar h1 { font-size: 14px; font-weight: 600; margin: 0; }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      padding: 16px 20px;
+      overflow-y: auto;
+      gap: 10px;
+      direction: rtl; /* עברית */
+    }
+
+    .row { display: flex; align-items: flex-end; gap: 8px; }
+    .row.user { justify-content: flex-end; }
+    .row.bot { justify-content: flex-start; }
+
+    .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: grid; place-items: center; font-size: 12px; font-weight: 700;
+      color: #374151; background: #e5e7eb; flex: 0 0 28px; user-select: none;
+    }
+
+    .bubble {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.06);
+      white-space: pre-wrap;
+      opacity: 0; transform: translateY(8px);
+      animation: fadeIn .5s forwards ease-out;
+    }
+    .bubble.user { background: var(--user); }
+    .bubble.bot { background: var(--bot); }
+
+    /* מפריד להודעות חסרות */
+    .gap {
+      width: 100%;
+      display: grid; place-items: center;
+      opacity: 0; transform: translateY(8px);
+      animation: fadeIn .5s forwards ease-out;
+    }
+    .gap .label {
+      max-width: 80%;
+      background: var(--note);
+      border: 1px dashed #e9c46a;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: #7c5a00;
+      text-align: center;
+    }
+
+    .statusbar {
+      font-size: 12px;
+      color: #6b7280;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 12px; border-top: 1px solid var(--border);
+      background: #fafbfc;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="window">
+    <div class="titlebar">
+      <div class="traffic"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+      <h1>הדמיית שיחה (תצוגת מחשב)</h1>
+    </div>
+
+    <div class="chat" id="chat"></div>
+
+    <div class="statusbar"><span>מצב: השמעה אוטומטית</span><span id="counter">0/0</span></div>
+  </div>
+
+  <script>
+    // ====== הגדרות מהירות ותזמון ======
+    const APPEAR_DELAY_MS = 2200;  // זמן בין הודעות
+
+    // ====== תוכן השיחה ======
+    // אפשר להוסיף "gap" כדי לסמן מקום שבו דילגנו על הודעות ביניים.
+    const script = [
+      { type: 'msg', sender: 'user', text: 'זה מרגש, סיימנו את פרק שלוש, הגיע הזמן לעבור לפרק 4' },
+      { type: 'msg', sender: 'bot', text: 'איזה יופי! 🥳\nסיום פרק 3 הוא באמת ציון דרך חשוב — עכשיו מתחילים את פרק 4: מאזני מסה 🎯\nאם תרצי, נוכל עכשיו:\n1. לבנות מבנה תוכן מפורט לפרק 4 (כותרות, תתי־נושאים, מעבר לוגי בין חלקים).\n2. לנסח פתיח לפרק – טקסט שמכניס את הקוראים לרעיון המרכזי של מאזן מסה.\n3. להתחיל לנסח את החלק הראשון – ההקדמה למאזני מסה, כולל הרעיון הפיזיקלי של שימור החומר, עם המחשה תהליכית.\nמה היית רוצה להתחיל לכתוב קודם — את המבנה הכללי או את הפתיח הסיפורי לפרק?' },
+      { type: 'gap', note: 'כאן הופיעה הודעת ביניים: חיבור קצר בין פרק 3 לפתיח של פרק 4' },
+      { type: 'msg', sender: 'user', text: 'הבעיה היא שמצד אחד הסברתי על כל הנושא של מה זה תהליך ודיאגרמת תהליכים בתחילת פרק 3... ומצד שני אני מרגישה שאי אפשר ישר לקפוץ למאזן מסה' },
+      { type: 'msg', sender: 'bot', text: 'נכון מאוד — ההבחנה שלך מדויקת פדגוגית 💡\n... הפתרון האידיאלי הוא קטע מעבר קצר...'},
+      { type: 'gap', note: 'כאן הופיעה הודעת ביניים: דוגמה קצרה לקטע מעבר' },
+      { type: 'msg', sender: 'user', text: 'לפני מאזן המסה צריך לדבר רגע גם על סיווג תהליכים. מנתי, חצי מנתי, רציף...' },
+      { type: 'msg', sender: 'bot', text: 'בדיוק כך — זו בחירה מצוינת מבחינה פדגוגית 👏\n... הבחנה בין batch ל-continuous.' },
+      { type: 'gap', note: 'כאן הופיעה הודעת ביניים: מיקוד בסדר ההוראה והגדרות' },
+      { type: 'msg', sender: 'user', text: 'לא, עדיף לחזור לסדר הקודם: קודם תפקידו של מאזן המסה ואז סוגי המערכות (מנתי/חצי מנתי/רציף/סגור/פתוח/אדיאבטי).' },
+      { type: 'msg', sender: 'bot', text: 'מעולה 👌 — זה באמת הסדר הכי טבעי מבחינת זרימה:\n1. למה צריך מאזן מסה.\n2. איך הוא עובד.\n3. ורק אז סוגי מערכות.' }
+    ];
+
+    const chat = document.getElementById('chat');
+    const counter = document.getElementById('counter');
+    counter.textContent = `0/${script.length}`;
+
+    function addMessage(entry) {
+      if (entry.type === 'gap') {
+        const wrap = document.createElement('div');
+        wrap.className = 'gap';
+        wrap.innerHTML = `<div class="label">— ${entry.note} —</div>`;
+        chat.appendChild(wrap);
+        return;
+      }
+      const row = document.createElement('div');
+      row.className = `row ${entry.sender}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = entry.sender === 'user' ? 'את' : 'AI';
+
+      const bubble = document.createElement('div');
+      bubble.className = `bubble ${entry.sender}`;
+      bubble.textContent = entry.text;
+
+      if (entry.sender === 'user') {
+        row.appendChild(bubble);
+        row.appendChild(avatar);
+      } else {
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+      }
+      chat.appendChild(row);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    // ניגון מדורג
+    let i = 0;
+    function step() {
+      if (i >= script.length) return;
+      addMessage(script[i]);
+      i += 1;
+      counter.textContent = `${i}/${script.length}`;
+      setTimeout(step, APPEAR_DELAY_MS);
+    }
+    step();
+  </script>
+</body>
+</html>
